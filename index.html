@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Taboche Restaurant POS</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">
+                <h1>Taboche Restaurant</h1>
+            </div>
+            <nav>
+                <ul>
+                    <li><button class="btn menu-icon" onclick="toggleSidebar()">☰</button></li>
+                    <li><input type="text" placeholder="Search products..." id="search-bar" onkeyup="searchItems()"></li>
+                    <li><button class="btn home" onclick="showTables()">🏠 Home</button></li>
+                    <li><a href="#"><span class="icon">🔔</span></a></li>
+                    <li><a href="#"><span class="icon">👤</span></a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main">
+        <aside class="sidebar" id="sidebar">
+            <h2>POS System</h2>
+            <ul>
+                <li><button onclick="showContent('home')"><span class="icon">🏠</span> Home</button></li>
+                <li><button onclick="showContent('menu-management')"><span class="icon">📋</span> Menu Management</button></li>
+                <li><button onclick="showContent('reports')"><span class="icon">📊</span> Reports</button></li>
+                <li><button onclick="showContent('staff')"><span class="icon">👥</span> Staff</button></li>
+                <li><button onclick="showContent('inventory')"><span class="icon">📦</span> Inventory</button></li>
+                <li><button onclick="showContent('settings')"><span class="icon">⚙️</span> Settings</button></li>
+                <li><button onclick="showContent('notifications')"><span class="icon">🔔</span> Notifications</button></li>
+                <li><button onclick="showContent('help')"><span class="icon">❓</span> Help</button></li>
+                <li><button onclick="logout()"><span class="icon">🚪</span> Logout</button></li>
+            </ul>
+        </aside>
+
+        <div class="content-container" id="content-container">
+            <section id="home" class="content active">
+                <h2>Home</h2>
+                <div class="tables" id="table-list"></div>
+            </section>
+
+            <section id="order-screen" class="content">
+                <h2>Order Screen for Table <span id="table-number"></span></h2>
+                <div class="order-screen">
+                    <div class="order-left">
+                        <div class="menu-navigation order-function">
+                            <h3>Menu Navigation</h3>
+                            <input type="text" id="search-bar" placeholder="Search items..." onkeyup="searchItems()">
+                            <div id="category-buttons" class="category-buttons"></div>
+                            <div id="menu-categories-order" class="menu-categories"></div>
+                        </div>
+                    </div>
+                    <div class="order-right">
+                        <div class="order-summary order-function">
+                            <h3>Order Summary</h3>
+                            <ul>
+                                <li>Order Number: <span id="order-number"></span></li>
+                                <li>Table Number: <span id="table-number-summary"></span></li>
+                                <li>Customer Name: <input type="text" id="customer-name" placeholder="Enter customer name"></li>
+                                <li>Order Items: <ul id="order-items" class="order-items-list"></ul></li>
+                                <li>Subtotal: <span id="order-subtotal">0.00</span></li>
+                                <li>Tax: <span id="order-tax">0.00</span></li>
+                                <li>Total: <span id="order-total">0.00</span></li>
+                            </ul>
+                            <button class="btn finalize-order" onclick="finalizeOrder()">Finalize Order</button>
+                            <button class="btn change-table" onclick="changeTableNumber()">Change Table</button>
+                        </div>
+                        <div class="payment-processing order-function">
+                            <h3>Payment Processing</h3>
+                            <div class="payment-options">
+                                <button onclick="openModal()">Process Payment</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Reports Section -->
+            <div id="reports" class="content">
+                <h2>Reports</h2>
+                <!-- Report Screen HTML -->
+                <div id="report-container">
+                    <div id="report-content"></div>
+                    <button id="reset-reports">Reset</button>
+                    <button id="daily-sales-summary">Daily Sales Summary</button>
+                    <button id="sales-by-category">Sales by Category</button>
+                    <button id="payment-method-summary">Payment Method Summary</button>
+                    <button id="void-refund-activity">Void and Refund Activity</button>
+                    <button id="customer-frequency-spend">Customer Frequency and Spend</button>
+                    <button id="loyalty-program-metrics">Loyalty Program Metrics</button>
+                    <button id="daily-financial-summary">Daily Financial Summary</button>
+                    <button id="discount-usage-report">Discount Usage Report</button>
+                    <button id="export-sharing-options">Export and Sharing Options</button>
+                    <button id="real-time-reporting">Real-Time Reporting</button>
+                    <button id="visualizations">Visualizations</button>
+                </div>
+                
+                <div id="report-content"></div>
+            </div>
+
+            <section id="menu-management" class="content">
+                <h2>Menu Management</h2>
+                <div class="menu-management-container">
+                    <button onclick="showCategoryForm()">Add New Category</button>
+                    <div id="category-list"></div>
+                    <button onclick="showItemForm()">Add New Item</button>
+                    <div id="menu-items-list"></div>
+                </div>
+
+                <!-- Category Form Modal -->
+                <div id="categoryFormModal" class="modal">
+                    <div class="modal-content">
+                        <span class="close" onclick="closeCategoryForm()">&times;</span>
+                        <h3 id="categoryFormTitle">Add New Category</h3>
+                        <form id="categoryForm" onsubmit="saveCategory(event)">
+                            <input type="hidden" id="categoryId">
+                            <div>
+                                <label for="categoryName">Category Name:</label>
+                                <input type="text" id="categoryName" required>
+                            </div>
+                            <button type="submit">Save</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Item Form Modal -->
+                <div id="itemFormModal" class="modal">
+                    <div class="modal-content">
+                        <span class="close" onclick="closeItemForm()">&times;</span>
+                        <h3 id="itemFormTitle">Add New Item</h3>
+                        <form id="itemForm" onsubmit="saveMenuItem(event)">
+                            <input type="hidden" id="itemId">
+                            <div>
+                                <label for="itemName">Item Name:</label>
+                                <input type="text" id="itemName" required>
+                            </div>
+                            <div>
+                                <label for="itemPrice">Price:</label>
+                                <input type="number" id="itemPrice" step="0.01" required>
+                            </div>
+                            <div>
+                                <label for="itemImage">Image:</label>
+                                <input type="file" id="itemImage" accept="image/*" required onchange="previewImage(event)">
+                            </div>
+                            <div>
+                                <label for="itemCategory">Category:</label>
+                                <select id="itemCategory" required>
+                                    <option value="">Select Category</option>
+                                </select>
+                            </div>
+                            <button type="submit">Save</button>
+                        </form>
+                        <img id="img-preview" style="display: none; width: 100px; height: 100px; margin-top: 10px;">
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+    
+    <!-- Payment Processing Modal -->
+    <div id="paymentModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2>Payment Processing</h2>
+            <p>Amount Due: $<span id="amount-due">0.00</span></p>
+            <div>
+                <label>Cash: $<input type="number" id="cash-amount" min="0" step="0.01" onchange="calculateTotalReceived()"></label>
+            </div>
+            <div>
+                <label>Card: $<input type="number" id="card-amount" min="0" step="0.01" onchange="calculateTotalReceived()"></label>
+            </div>
+            <div>
+                <label>Digital Wallet: $<input type="number" id="wallet-amount" min="0" step="0.01" onchange="calculateTotalReceived()"></label>
+            </div>
+            <p>Total Received: $<span id="total-received">0.00</span></p>
+            <p>Change: $<span id="change">0.00</span></p>
+            <button onclick="finalizePayment()">Finalize Payment</button>
+        </div>
+    </div>
+
+    <!-- Receipt Printing -->
+    <div id="receipt" style="display: none;">
+        <h2>Receipt</h2>
+        <div id="receipt-content"></div>
+        <button onclick="printReceipt()">Print Receipt</button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
+
