@@ -57,6 +57,7 @@ function saveCategory(event) {
     loadCategoryButtons();
 }
 
+
 function editCategory(id) {
     const category = menuCategories.find(cat => cat.id === id);
     if (category) {
@@ -529,7 +530,6 @@ function markTableAsOccupied(tableNumber) {
         alert('Table not found.');
     }
 }
-
 function clearTableStatus(tableNumber) {
     const tableButton = Array.from(document.querySelectorAll('.table')).find(button => button.innerText === 'Table ' + tableNumber);
     if (tableButton) {
@@ -544,12 +544,21 @@ function clearTableStatus(tableNumber) {
     }
 }
 
+function changeTableColor(tableNumber, color) {
+    const tableButton = Array.from(document.querySelectorAll('.table')).find(button => button.innerText === 'Table ' + tableNumber);
+    if (tableButton) {
+        tableButton.style.backgroundColor = color;
+    }
+}
+
 function settlePayment(tableNumber) {
     alert('Payment settled for Table ' + tableNumber);
 
     clearTableStatus(tableNumber);
+    changeTableColor(tableNumber, 'green'); // Example color change to green
     showTables();
 }
+
 
 function openModal() {
     const totalAmount = parseFloat(document.getElementById('order-total').innerText);
@@ -598,11 +607,19 @@ function finalizePayment() {
 }
 
 function processPayment(tableNumber, paymentMethods, amountDue, change) {
+    // Display a confirmation message with the change amount
     alert(`Payment successful! Change: $${change.toFixed(2)}`);
+    
+    // Generate the receipt with the payment details
     generateReceipt(paymentMethods, amountDue, change);
+    
+    // Clear the status of the specified table
     clearTableStatus(tableNumber);
+    
+    // Update the display of available tables
     showTables();
 }
+
 
 function generateReceipt(paymentMethods, amountDue, change) {
     const receiptContent = document.getElementById('receipt-content');
@@ -645,7 +662,6 @@ function generateReceipt(paymentMethods, amountDue, change) {
     document.getElementById('receipt').style.display = 'block';
     printReceipt();
 }
-
 function printReceipt() {
     const receipt = document.getElementById('receipt');
     const newWindow = window.open('', 'Print-Window');
@@ -655,9 +671,10 @@ function printReceipt() {
     setTimeout(() => {
         newWindow.close();
         document.getElementById('receipt').style.display = 'none';
-        document.getElementById('receipt-content').innerHTML = '';
+        document.getElementById('receiptContent').innerHTML = ''; // Corrected ID
     }, 10);
 }
+
 
 function closeModal() {
     document.getElementById('paymentModal').style.display = 'none';
@@ -781,13 +798,97 @@ function generateSalesReport() {
 
     reportContent.innerHTML = reportHTML;
 }
-
+// Function to clear sales data and reports
 function resetSalesData() {
+    console.log('Resetting sales data');
+    // Clear the sales data array
     salesData = [];
     localStorage.setItem('salesData', JSON.stringify(salesData));
-    alert('Sales data has been reset.');
+
+    // Clear specific report data
+    document.getElementById('totalSales').innerText = '';
+    document.getElementById('numTransactions').innerText = '';
+    document.getElementById('avgTransactionValue').innerText = '';
+
+    // Optional: Clear other report elements
+    document.querySelectorAll('.report').forEach(report => report.innerText = '');
+
+    // Display a confirmation message
+    alert('Sales data and reports have been reset.');
 }
 
+// Function to handle reset and print reports
+function resetAndPrintReports() {
+    console.log('Reset and Print Reports button clicked');
+    
+    // Reset all reports data
+    resetReportsData();
+
+    // Generate all reports and then print and reset
+    generateAllReports();
+    setTimeout(() => {
+        console.log('Generating Reports...');
+        printSalesReport();
+        resetSalesData();
+    }, 2000); // Ensure a delay to allow reports generation
+}
+
+// Function to print sales report
+function printSalesReport() {
+    const reportContent = document.getElementById('report-content').innerHTML;
+    const newWindow = window.open('', 'Print-Window');
+    newWindow.document.open();
+    newWindow.document.write(`<html><body onload="window.print()">${reportContent}</body></html>`);
+    newWindow.document.close();
+    setTimeout(() => {
+        newWindow.close();
+    }, 10);
+}
+
+// Function to generate all reports
+function generateAllReports() {
+    console.log('Generating all reports');
+    generateDailySalesSummary();
+    generateSalesByCategory();
+    generatePaymentMethodSummary();
+    generateVoidRefundActivity();
+    generateCustomerFrequencySpend();
+    generateLoyaltyProgramMetrics();
+    generateDailyFinancialSummary();
+    generateDiscountUsageReport();
+    generateExportSharingOptions();
+    generateRealTimeReporting();
+    generateVisualizations();
+}
+
+// Function to reset reports data
+function resetReportsData() {
+    console.log('Resetting reports data');
+    // Clear all report data from localStorage
+    localStorage.removeItem('salesData');
+    localStorage.removeItem('voidRefundData');
+    localStorage.removeItem('customerData');
+    localStorage.removeItem('loyaltyData');
+    localStorage.removeItem('discountData');
+
+    // Reset the report content
+    document.getElementById('report-content').innerHTML = '<p>No reports generated yet.</p>';
+}
+
+// Event listeners for various buttons
+document.getElementById('reset-reports').addEventListener('click', resetAndPrintReports);
+document.getElementById('print-sales-report').addEventListener('click', printSalesReport);
+document.getElementById('generate-sales-report').addEventListener('click', generateSalesReport);
+
+document.addEventListener('DOMContentLoaded', () => {
+    loadCategoryList();
+    loadCategoryButtons();
+    showTables();
+    scheduleDailyReset();
+    setupReportButtons();
+});
+
+// Function to schedule a daily reset
 function scheduleDailyReset() {
     const now = new Date();
     const midnight = new Date();
@@ -798,6 +899,7 @@ function scheduleDailyReset() {
         scheduleDailyReset();
     }, timeUntilMidnight);
 }
+
 
 function printSalesReport() {
     const reportContent = document.getElementById('report-content').innerHTML;
@@ -820,22 +922,9 @@ document.addEventListener('DOMContentLoaded', () => {
     scheduleDailyReset();
     setupReportButtons();
 
+    // Ensure the reset-reports button is linked to the resetAndPrintReports function
     document.getElementById('reset-reports').addEventListener('click', resetAndPrintReports);
 });
-
-function resetAndPrintReports() {
-    console.log('Reset and Print Reports button clicked');
-
-    // Clear any previous content to avoid duplication
-    document.getElementById('report-content').innerHTML = '';
-
-    // Generate all reports and then print and reset
-    generateAllReports();
-    setTimeout(() => {
-        printReports();
-        resetReportsData();
-    }, 2000); // Ensure a delay to allow reports generation
-}
 
 function generateAllReports() {
     console.log('Generating all reports');
@@ -864,18 +953,7 @@ function printReports() {
     }, 10);
 }
 
-function resetReportsData() {
-    console.log('Resetting reports data');
-    // Clear all report data from localStorage
-    localStorage.removeItem('salesData');
-    localStorage.removeItem('voidRefundData');
-    localStorage.removeItem('customerData');
-    localStorage.removeItem('loyaltyData');
-    localStorage.removeItem('discountData');
 
-    // Reset the report content
-    document.getElementById('report-content').innerHTML = '<p>No reports generated yet.</p>';
-}
 
 function setupReportButtons() {
     console.log('Setting up report buttons');

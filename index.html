@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Taboche Restaurant POS</title>
     <link rel="stylesheet" href="styles.css">
 </head>
@@ -16,12 +17,15 @@
                     <li><button class="btn menu-icon" onclick="toggleSidebar()">☰</button></li>
                     <li><input type="text" placeholder="Search products..." id="search-bar" onkeyup="searchItems()"></li>
                     <li><button class="btn home" onclick="showTables()">🏠 Home</button></li>
-                    <li><a href="#"><span class="icon">🔔</span></a></li>
+                    <li><a href="#"><span class="icon">🔔</span><span class="badge" id="notification-count">0</span></a></li>
                     <li><a href="#"><span class="icon">👤</span></a></li>
                 </ul>
             </nav>
         </div>
     </header>
+</body>
+</html>
+
 
     <main class="main">
         <aside class="sidebar" id="sidebar">
@@ -33,7 +37,7 @@
                 <li><button onclick="showContent('staff')"><span class="icon">👥</span> Staff</button></li>
                 <li><button onclick="showContent('inventory')"><span class="icon">📦</span> Inventory</button></li>
                 <li><button onclick="showContent('settings')"><span class="icon">⚙️</span> Settings</button></li>
-                <li><button onclick="showContent('notifications')"><span class="icon">🔔</span> Notifications</button></li>
+                <li><button onclick="showContent('notifications')"><span class="icon">🔔</span> Notifications <span class="badge">3</span></button></li>
                 <li><button onclick="showContent('help')"><span class="icon">❓</span> Help</button></li>
                 <li><button onclick="logout()"><span class="icon">🚪</span> Logout</button></li>
             </ul>
@@ -51,7 +55,7 @@
                     <div class="order-left">
                         <div class="menu-navigation order-function">
                             <h3>Menu Navigation</h3>
-                            <input type="text" id="search-bar" placeholder="Search items..." onkeyup="searchItems()">
+                            <input type="text" id="search-bar-order" placeholder="Search items..." onkeyup="searchItemsOrder()">
                             <div id="category-buttons" class="category-buttons"></div>
                             <div id="menu-categories-order" class="menu-categories"></div>
                         </div>
@@ -81,39 +85,49 @@
                 </div>
             </section>
 
-            <!-- Reports Section -->
-            <div id="reports" class="content">
+            <section id="reports" class="content">
                 <h2>Reports</h2>
-                <!-- Report Screen HTML -->
                 <div id="report-container">
-                    <div id="report-content"></div>
+                    <div id="report-content">
+                        <div id="totalSales" class="report"></div>
+                        <div id="numTransactions" class="report"></div>
+                        <div id="avgTransactionValue" class="report"></div>
+                        <div id="dailySalesSummary" class="report"></div> <!-- Changed ID -->
+                        <div id="salesByCategory" class="report"></div> <!-- Changed ID -->
+                        <div id="paymentMethodSummary" class="report"></div> <!-- Changed ID -->
+                        <div id="voidRefundActivity" class="report"></div> <!-- Changed ID -->
+                        <div id="customerFrequencySpend" class="report"></div> <!-- Changed ID -->
+                        <div id="loyaltyProgramMetrics" class="report"></div> <!-- Changed ID -->
+                        <div id="dailyFinancialSummary" class="report"></div> <!-- Changed ID -->
+                        <div id="discountUsageReport" class="report"></div> <!-- Changed ID -->
+                        <div id="exportSharingOptions" class="report"></div> <!-- Changed ID -->
+                        <div id="realTimeReporting" class="report"></div> <!-- Changed ID -->
+                        <div id="visualizationsReport" class="report"></div> <!-- Changed ID -->
+                    </div>
                     <button id="reset-reports">Reset</button>
-                    <button id="daily-sales-summary">Daily Sales Summary</button>
-                    <button id="sales-by-category">Sales by Category</button>
-                    <button id="payment-method-summary">Payment Method Summary</button>
-                    <button id="void-refund-activity">Void and Refund Activity</button>
-                    <button id="customer-frequency-spend">Customer Frequency and Spend</button>
-                    <button id="loyalty-program-metrics">Loyalty Program Metrics</button>
-                    <button id="daily-financial-summary">Daily Financial Summary</button>
-                    <button id="discount-usage-report">Discount Usage Report</button>
-                    <button id="export-sharing-options">Export and Sharing Options</button>
-                    <button id="real-time-reporting">Real-Time Reporting</button>
-                    <button id="visualizations">Visualizations</button>
+                    <button id="btn-dailySalesSummary">Daily Sales Summary</button> <!-- Changed ID -->
+                    <button id="btn-salesByCategory">Sales by Category</button> <!-- Changed ID -->
+                    <button id="btn-paymentMethodSummary">Payment Method Summary</button> <!-- Changed ID -->
+                    <button id="btn-voidRefundActivity">Void and Refund Activity</button> <!-- Changed ID -->
+                    <button id="btn-customerFrequencySpend">Customer Frequency and Spend</button> <!-- Changed ID -->
+                    <button id="btn-loyaltyProgramMetrics">Loyalty Program Metrics</button> <!-- Changed ID -->
+                    <button id="btn-dailyFinancialSummary">Daily Financial Summary</button> <!-- Changed ID -->
+                    <button id="btn-discountUsageReport">Discount Usage Report</button> <!-- Changed ID -->
+                    <button id="btn-exportSharingOptions">Export and Sharing Options</button> <!-- Changed ID -->
+                    <button id="btn-realTimeReporting">Real-Time Reporting</button> <!-- Changed ID -->
+                    <button id="btn-visualizationsReport">Visualizations</button> <!-- Changed ID -->
                 </div>
-                
-                <div id="report-content"></div>
-            </div>
-
+            </section>
+            
             <section id="menu-management" class="content">
                 <h2>Menu Management</h2>
                 <div class="menu-management-container">
-                    <button onclick="showCategoryForm()">Add New Category</button>
+                    <button type="button" onclick="showCategoryForm()">Add New Category</button>
                     <div id="category-list"></div>
-                    <button onclick="showItemForm()">Add New Item</button>
+                    <button type="button" onclick="showItemForm()">Add New Item</button>
                     <div id="menu-items-list"></div>
                 </div>
-
-                <!-- Category Form Modal -->
+            
                 <div id="categoryFormModal" class="modal">
                     <div class="modal-content">
                         <span class="close" onclick="closeCategoryForm()">&times;</span>
@@ -128,8 +142,7 @@
                         </form>
                     </div>
                 </div>
-
-                <!-- Item Form Modal -->
+            
                 <div id="itemFormModal" class="modal">
                     <div class="modal-content">
                         <span class="close" onclick="closeItemForm()">&times;</span>
@@ -156,13 +169,15 @@
                             </div>
                             <button type="submit">Save</button>
                         </form>
-                        <img id="img-preview" style="display: none; width: 100px; height: 100px; margin-top: 10px;">
+                      
                     </div>
                 </div>
             </section>
-        </div>
-    </main>
-    
+            
+
+
+      
+
     <!-- Payment Processing Modal -->
     <div id="paymentModal" class="modal">
         <div class="modal-content">
@@ -181,17 +196,11 @@
             <p>Total Received: $<span id="total-received">0.00</span></p>
             <p>Change: $<span id="change">0.00</span></p>
             <button onclick="finalizePayment()">Finalize Payment</button>
-        </div>
-    </div>
-
-    <!-- Receipt Printing -->
-    <div id="receipt" style="display: none;">
-        <h2>Receipt</h2>
-        <div id="receipt-content"></div>
-        <button onclick="printReceipt()">Print Receipt</button>
-    </div>
-
-    <script src="script.js"></script>
-</body>
-</html>
-
+            </div>
+            </div>
+            
+            <!-- Script to handle all functionalities -->
+            <script src="script.js"></script>
+            </body>
+            </html>
+            
